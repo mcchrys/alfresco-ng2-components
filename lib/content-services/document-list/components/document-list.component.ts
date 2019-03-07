@@ -643,7 +643,7 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
                 });
         } else {
 
-            this.baseDocumentListService.getNodeChildren(null, {
+            this.baseDocumentListService.getFolder(null, {
                 maxItems: this._pagination.maxItems,
                 skipCount: this._pagination.skipCount,
                 rootFolderId: nodeId,
@@ -660,7 +660,7 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
     }
 
     getSourceNodeWithPath(nodeId: string): Observable<NodeEntry> {
-        let getSourceObservable = this.baseDocumentListService.getNodeById(nodeId, this.includeFields);
+        let getSourceObservable = this.baseDocumentListService.getFolderNode(nodeId, this.includeFields);
 
         getSourceObservable.subscribe((nodeEntry: NodeEntry) => {
             this.folderNode = nodeEntry.entry;
