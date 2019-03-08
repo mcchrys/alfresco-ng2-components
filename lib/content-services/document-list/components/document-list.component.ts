@@ -58,19 +58,12 @@ import { NavigableComponentInterface } from '../../breadcrumb/navigable-componen
 import { RowFilter } from '../data/row-filter.model';
 import { Observable } from 'rxjs/index';
 import { BaseDocumentListService } from '../services/base-document-list.service';
-import { DocumentListService } from '../services/document-list.service';
 
 @Component({
     selector: 'adf-document-list',
     styleUrls: ['./document-list.component.scss'],
     templateUrl: './document-list.component.html',
-    encapsulation: ViewEncapsulation.None,
-    providers: [
-        {
-            provide: BaseDocumentListService,
-            useClass: DocumentListService
-        }
-    ]
+    encapsulation: ViewEncapsulation.None
 })
 export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, AfterContentInit, PaginatedComponent, NavigableComponentInterface {
 
