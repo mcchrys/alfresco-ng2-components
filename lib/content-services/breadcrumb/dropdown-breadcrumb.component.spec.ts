@@ -20,25 +20,29 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { setupTestBed } from '@alfresco/adf-core';
 import { fakeNodeWithCreatePermission } from '../mock';
-import { DocumentListComponent } from '../document-list';
+import { DocumentListComponent, DocumentListService } from '../document-list';
 import { DropdownBreadcrumbComponent } from './dropdown-breadcrumb.component';
 import { ContentTestingModule } from '../testing/content.testing.module';
+import { of } from 'rxjs';
 
 describe('DropdownBreadcrumb', () => {
 
     let component: DropdownBreadcrumbComponent;
     let fixture: ComponentFixture<DropdownBreadcrumbComponent>;
     let documentList: DocumentListComponent;
+    let documentListService: DocumentListService = jasmine.createSpyObj({'loadFolderByNodeId' : of('')});
 
     setupTestBed({
         imports: [ContentTestingModule],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+        providers : [{ provide: DocumentListService, useValue: documentListService }]
     });
 
     beforeEach(async(() => {
         fixture = TestBed.createComponent(DropdownBreadcrumbComponent);
         component = fixture.componentInstance;
         documentList = TestBed.createComponent<DocumentListComponent>(DocumentListComponent).componentInstance;
+        documentListService = TestBed.get(DocumentListService);
     }));
 
     afterEach(async(() => {
@@ -150,20 +154,29 @@ describe('DropdownBreadcrumb', () => {
         });
     });
 
-    it('should update document list  when clicking on an option', (done) => {
-        spyOn(documentList, 'loadFolderByNodeId').and.stub();
+    it("should update document list  when clicking on an option", done => {
         component.target = documentList;
-        let fakeNodeWithCreatePermissionInstance = JSON.parse(JSON.stringify(fakeNodeWithCreatePermission));
-        fakeNodeWithCreatePermissionInstance.path.elements = [{ id: '1', name: 'Stark Industries' }];
+        let fakeNodeWithCreatePermissionInstance = JSON.parse(
+            JSON.stringify(fakeNodeWithCreatePermission)
+        );
+        fakeNodeWithCreatePermissionInstance.path.elements = [
+            { id: "1", name: "Stark Industries" }
+        ];
         triggerComponentChange(fakeNodeWithCreatePermissionInstance);
 
         fixture.whenStable().then(() => {
             openSelect();
             fixture.whenStable().then(() => {
-
                 clickOnTheFirstOption();
 
-                expect(documentList.loadFolderByNodeId).toHaveBeenCalledWith('1');
+                expect(
+                    documentListService.loadFolderByNodeId
+                ).toHaveBeenCalledWith(
+                    "1",
+                    documentList.DEFAULT_PAGINATION,
+                    documentList.includeFields,
+                    documentList.where
+                );
                 done();
             });
         });
