@@ -53,11 +53,10 @@ import { presetsDefaultModel } from '../models/preset.model';
 import { ContentActionModel } from './../models/content-action.model';
 import { PermissionStyleModel } from './../models/permissions-style.model';
 import { NodeEntityEvent, NodeEntryEvent } from './node.event';
-import { CustomResourcesService } from './../services/custom-resources.service';
 import { NavigableComponentInterface } from '../../breadcrumb/navigable-component.interface';
 import { RowFilter } from '../data/row-filter.model';
 import { Observable } from 'rxjs/index';
-import { BaseDocumentListService } from '../services/base-document-list.service';
+import { DocumentListService } from '../services/document-list.service';
 
 @Component({
     selector: 'adf-document-list',
@@ -317,12 +316,11 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
     private rowMenuCache: { [key: string]: ContentActionModel[] } = {};
     private loadingTimeout;
 
-    constructor(private baseDocumentListService: BaseDocumentListService,
+    constructor(private documentListService: DocumentListService,
                 private ngZone: NgZone,
                 private elementRef: ElementRef,
                 private appConfig: AppConfigService,
                 private userPreferencesService: UserPreferencesService,
-                private customResourcesService: CustomResourcesService,
                 private contentService: ContentService,
                 private thumbnailService: ThumbnailService,
                 private alfrescoApiService: AlfrescoApiService) {
@@ -622,38 +620,16 @@ export class DocumentListComponent implements OnInit, OnChanges, OnDestroy, Afte
             this.setupDefaultColumns(this._currentFolderId);
         }
 
-        this.loadFolderByNodeId(this._currentFolderId);
-    }
-
-    loadFolderByNodeId(nodeId: string) {
-        if (this.customResourcesService.isCustomSource(nodeId)) {
-            this.updateCustomSourceData(nodeId);
-            this.customResourcesService.loadFolderByNodeId(nodeId, this._pagination, this.includeFields)
-                .subscribe((nodePaging: NodePaging) => {
-                    this.onPageLoaded(nodePaging);
-                }, (err) => {
-                    this.error.emit(err);
-                });
-        } else {
-
-            this.baseDocumentListService.getFolder(null, {
-                maxItems: this._pagination.maxItems,
-                skipCount: this._pagination.skipCount,
-                rootFolderId: nodeId,
-                where: this.where
-            }, this.includeFields)
-                .subscribe((nodePaging: NodePaging) => {
-                    this.getSourceNodeWithPath(nodeId).subscribe((nodeEntry: NodeEntry) => {
-                        this.onPageLoaded(nodePaging);
-                    });
-                }, (err) => {
-                    this.handleError(err);
-                });
-        }
+        this.documentListService.loadFolderByNodeId(this._currentFolderId, this._pagination, this.includeFields, this.where)
+            .subscribe((nodePaging: NodePaging) => {
+                this.onPageLoaded(nodePaging);
+            }, (err) => {
+                this.handleError(err);
+            });
     }
 
     getSourceNodeWithPath(nodeId: string): Observable<NodeEntry> {
-        let getSourceObservable = this.baseDocumentListService.getFolderNode(nodeId, this.includeFields);
+        let getSourceObservable = this.documentListService.getFolderNode(nodeId, this.includeFields);
 
         getSourceObservable.subscribe((nodeEntry: NodeEntry) => {
             this.folderNode = nodeEntry.entry;
