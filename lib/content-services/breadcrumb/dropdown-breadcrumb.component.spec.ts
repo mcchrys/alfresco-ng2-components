@@ -154,13 +154,13 @@ describe('DropdownBreadcrumb', () => {
         });
     });
 
-    it("should update document list  when clicking on an option", done => {
+    it('should update document list  when clicking on an option', (done) => {
         component.target = documentList;
         let fakeNodeWithCreatePermissionInstance = JSON.parse(
             JSON.stringify(fakeNodeWithCreatePermission)
         );
         fakeNodeWithCreatePermissionInstance.path.elements = [
-            { id: "1", name: "Stark Industries" }
+            { id: '1', name: 'Stark Industries' }
         ];
         triggerComponentChange(fakeNodeWithCreatePermissionInstance);
 
@@ -172,7 +172,7 @@ describe('DropdownBreadcrumb', () => {
                 expect(
                     documentListService.loadFolderByNodeId
                 ).toHaveBeenCalledWith(
-                    "1",
+                    '1',
                     documentList.DEFAULT_PAGINATION,
                     documentList.includeFields,
                     documentList.where

@@ -64,7 +64,7 @@ describe('Breadcrumb', () => {
     });
 
     it('should emit navigation event', (done) => {
-        let node = <PathElementEntity>{ id: '-id-', name: 'name' };
+        let node = <PathElementEntity> { id: '-id-', name: 'name' };
         component.navigate.subscribe((val) => {
             expect(val).toBe(node);
             done();
@@ -75,7 +75,7 @@ describe('Breadcrumb', () => {
 
     it('should update document list on click', () => {
 
-        let node = <PathElementEntity>{ id: '-id-', name: 'name' };
+        let node = <PathElementEntity> { id: '-id-', name: 'name' };
         component.target = documentListComponent;
 
         component.onRoutePathClick(node, null);
