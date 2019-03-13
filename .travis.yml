@@ -59,15 +59,20 @@ jobs:
           - npm run build:dist || exit 1
           - ./scripts/license-list-generator.sh
         - stage: Unit test
-          name: core
+          name: demo-shell  core   extensions
+          script:
+            if ([ "$TRAVIS_BRANCH" = "master" ]);
+            then
+                (./scripts/start.sh -t -ss || exit 1;);
+            else
+                (./scripts/start.sh -dev -t -ss -si || exit 1;);
+            fi;
           script:
             AFFECTED_LIBS="$(./scripts/affected-libs.sh -gnu -b $TRAVIS_BRANCH)";
             if [[ $AFFECTED_LIBS =~ "core$" || $TRAVIS_PULL_REQUEST == "false" ]];
             then
                 ng test core --watch=false || exit 1;
             fi;
-        - stage: Unit test
-          name: extensions
           script:
             AFFECTED_LIBS="$(./scripts/affected-libs.sh -gnu -b $TRAVIS_BRANCH)";
             if [[ $AFFECTED_LIBS =~ "extensions$" || $TRAVIS_PULL_REQUEST == "false"  ]];
@@ -75,15 +80,13 @@ jobs:
                 ng test extensions --watch=false || exit 1;
             fi;
         - stage: Unit test
-          name: process-services
+          name: process-services and insights
           script:
             AFFECTED_LIBS="$(./scripts/affected-libs.sh -gnu -b $TRAVIS_BRANCH)";
             if [[ $AFFECTED_LIBS =~ "process-services$" || $TRAVIS_PULL_REQUEST == "false"  ]];
             then
                 ng test process-services --watch=false || exit 1;
             fi;
-        - stage: Unit test
-          name: insights
           script:
             AFFECTED_LIBS="$(./scripts/affected-libs.sh -gnu -b $TRAVIS_BRANCH)";
             if [[ $AFFECTED_LIBS =~ "insights$" || $TRAVIS_PULL_REQUEST == "false"  ]];
@@ -106,13 +109,6 @@ jobs:
             then
                 ng test process-services-cloud --watch=false || exit 1;
             fi;
-        - stage: Unit test
-          name: demo-shell
-          script:   if ([ "$TRAVIS_BRANCH" = "master" ]); then
-                            (./scripts/start.sh -t -ss || exit 1;);
-                       else
-                            (./scripts/start.sh -dev -t -ss -si || exit 1;);
-                    fi;
         - stage: Update children projects dependency #Update generator-ng2-alfresco-app
           name: Update Generator
           if: tag =~ .*beta.*
